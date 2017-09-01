@@ -1,4 +1,4 @@
-package io.nade.email.decoder
+package io.nade.email.parse
 
 import org.apache.james.mime4j.dom.MessageBuilder
 import org.apache.james.mime4j.field.LenientFieldParser
@@ -7,14 +7,14 @@ import org.apache.james.mime4j.message.DefaultMessageBuilder
 import java.io.InputStream
 import java.util.*
 
-class Decoder(private val msgBuilder: MessageBuilder) {
+class Parser(private val msgBuilder: MessageBuilder) {
     /**
      * Decode an RFC 822 message into a structured object.
      *
      * @param istream An input stream with the raw email source
      * @return The decoded message
      */
-    fun decode(istream: InputStream): DecodedMessage {
+    fun parse(istream: InputStream): DecodedMessage {
         val parsedMessage = msgBuilder.parseMessage(istream)
 
         val subject   = parsedMessage.subject ?: ""
