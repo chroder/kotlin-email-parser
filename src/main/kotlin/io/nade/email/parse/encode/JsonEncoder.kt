@@ -23,5 +23,6 @@ class JsonEncoder(private val gson: Gson) : EncoderInterface {
     override fun encodeToStream(msg: ParsedMessage, ostream: OutputStream) {
         val writer = OutputStreamWriter(ostream, StandardCharsets.UTF_8)
         gson.toJson(msg, writer)
+        writer.flush()
     }
 }

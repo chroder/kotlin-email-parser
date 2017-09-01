@@ -34,5 +34,7 @@ class DebugEncoder : EncoderInterface {
         if (msg.bodyText != null) {
             writer.appendln(msg.bodyText)
         }
+
+        writer.flush()
     }
 }
