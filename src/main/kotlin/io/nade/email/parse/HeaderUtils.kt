@@ -1,4 +1,4 @@
-package io.nade.email.decoder
+package io.nade.email.parse
 
 import org.apache.james.mime4j.dom.Message
 import org.apache.james.mime4j.dom.address.AddressList

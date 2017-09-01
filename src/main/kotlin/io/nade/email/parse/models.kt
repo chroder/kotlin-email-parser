@@ -1,8 +1,8 @@
-package io.nade.email.decoder
+package io.nade.email.parse
 
 import java.util.*
 
-data class DecodedMessage(
+data class ParsedMessage(
     val subject: String = "",
     val messageId: String? = "",
     val from: Address? = null,
@@ -26,7 +26,15 @@ interface HeaderInterface {
 data class Address(
     val name: String? = "",
     val email: String = ""
-)
+) {
+    override fun toString(): String {
+        if (name != null) {
+            return "$name <$email>"
+        } else {
+            return email
+        }
+    }
+}
 
 data class Header(
     override val name: String,

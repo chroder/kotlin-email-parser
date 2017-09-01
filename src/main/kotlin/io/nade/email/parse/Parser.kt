@@ -14,7 +14,7 @@ class Parser(private val msgBuilder: MessageBuilder) {
      * @param istream An input stream with the raw email source
      * @return The decoded message
      */
-    fun parse(istream: InputStream): DecodedMessage {
+    fun parse(istream: InputStream): ParsedMessage {
         val parsedMessage = msgBuilder.parseMessage(istream)
 
         val subject   = parsedMessage.subject ?: ""
@@ -57,7 +57,7 @@ class Parser(private val msgBuilder: MessageBuilder) {
         val headers    = parsedMessage.header.fields.map { HeaderUtils.fieldToHeader(it) }
         val references = HeaderUtils.parseReferences(parsedMessage.header.getFields("References"))
 
-        return DecodedMessage(
+        return ParsedMessage(
             subject = subject,
             messageId = messageId,
             from = fromAddress,
@@ -75,14 +75,14 @@ class Parser(private val msgBuilder: MessageBuilder) {
     }
 
     companion object {
-        fun create(): Decoder {
+        fun create(): Parser {
             val fieldParser = LenientFieldParser()
             fieldParser.setFieldParser("Return-Path", MailboxFieldLenientImpl.PARSER)
 
             val msgBuilder = DefaultMessageBuilder();
             msgBuilder.setFieldParser(fieldParser)
 
-            return Decoder(msgBuilder)
+            return Parser(msgBuilder)
         }
     }
 }
