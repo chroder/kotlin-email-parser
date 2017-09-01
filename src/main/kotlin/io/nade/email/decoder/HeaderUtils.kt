@@ -1,4 +1,4 @@
-package io.nade.email_decoder
+package io.nade.email.decoder
 
 import org.apache.james.mime4j.dom.Message
 import org.apache.james.mime4j.dom.address.AddressList
@@ -13,34 +13,36 @@ import java.util.*
 
 object HeaderUtils {
     /**
-     * Create an Addr model from a Mailbox field.
+     * Create an Address model from a Mailbox field.
      *
      * @param mb The Mailbox field
-     * @return An Addr model
+     * @return An Address model
      */
-    fun mailboxToAddr(mb: Mailbox): Addr {
-        val name = mb.name?.trim()?.trim('"', '\'') ?: ""
-        return Addr(name, "${mb.localPart}@${mb.domain}")
+    fun mailboxToAddr(mb: Mailbox): Address {
+        val cleanName = mb.name?.trim()?.trim('"', '\'') ?: ""
+        val name      = if (cleanName.isNotEmpty()) cleanName else null
+
+        return Address(name, "${mb.localPart}@${mb.domain}")
     }
 
     /**
-     * Create a list of Addr models from a MailboxList.
+     * Create a list of Address models from a MailboxList.
      *
      * @param mbs The MailboxList to process
-     * @return A list of Addr models
+     * @return A list of Address models
      */
-    fun mailboxListToAddrList(mbs: MailboxList): List<Addr> {
+    fun mailboxListToAddrList(mbs: MailboxList): List<Address> {
         return mbs.map { mailboxToAddr(it) }
     }
 
     /**
-     * Create a list of Addr models from a AddressList. Note that this creates a flat list. Any grouping
+     * Create a list of Address models from a AddressList. Note that this creates a flat list. Any grouping
      * data that might be contained within the AddressList will be lost.
      *
      * @param mbs The AddressList to process
-     * @return A list of Addr models (flat)
+     * @return A list of Address models (flat)
      */
-    fun mailboxListToAddrList(mbs: AddressList): List<Addr> {
+    fun mailboxListToAddrList(mbs: AddressList): List<Address> {
         return mbs.flatten().map { mailboxToAddr(it) }
     }
 
@@ -57,7 +59,7 @@ object HeaderUtils {
         }
 
         val rec = msg.header.getField("Received")?.body ?: return null
-        val parts = rec.split(';', limit = 1)
+        val parts = rec.split(';', limit = 2)
         if (parts.size != 2) {
             return null
         }
@@ -71,25 +73,25 @@ object HeaderUtils {
     }
 
     /**
-     * Given a Return-Path header, get an Addr. If the Return-Path is <>, that value will be
-     * returned in an Addr even though it's not a valid addr-spec.
+     * Given a Return-Path header, get an Address. If the Return-Path is <>, that value will be
+     * returned in an Address even though it's not a valid addr-spec.
      *
      * The <> value is often used to signify a client does not want a bounce in the event of an error.
      * This is usualy necessary because in the absense of a Return-Path, many servers bounce the message
      * to the From or Sender as a fallback. The <> value essentially communicates that the absense of a value
      * was on purpose.
      *
-     * @return Addr with the return path, or null.
+     * @return Address with the return path, or null.
      */
-    fun getReturnPathAddr(field: Field): Addr? {
-        if (field is MailboxListField && field.isValidField && field.mailboxList.size >= 1) {
+    fun getReturnPathAddr(field: Field): Address? {
+        if (field is MailboxListField && field.mailboxList?.isNotEmpty() == true) {
             return mailboxToAddr(field.mailboxList[0])
         }
 
         val body = field.body ?: return null
         if (body == "<>") {
             // special no return value should be kept
-            return Addr("NORETURN", "<>")
+            return Address("NORETURN", "<>")
         }
 
         return null
@@ -126,7 +128,7 @@ object HeaderUtils {
      */
     fun parseReferences(fields: List<Field>): List<String> {
         return fields.flatMap { field ->
-            field.body?.split("\\s+".toRegex())?.mapNotNull { it.trim() } ?: listOf()
+            field.body?.split("\\s+".toRegex())?.map { it.trim() } ?: listOf()
         }
     }
 }

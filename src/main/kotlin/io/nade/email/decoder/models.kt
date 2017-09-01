@@ -1,16 +1,16 @@
-package io.nade.email_decoder
+package io.nade.email.decoder
 
 import java.util.*
 
 data class DecodedMessage(
     val subject: String = "",
     val messageId: String? = "",
-    val from: Addr? = null,
-    val sender: Addr? = null,
-    val replyTo: List<Addr>,
-    val returnPath: Addr? = null,
-    val tos: List<Addr>,
-    val ccs: List<Addr>,
+    val from: Address? = null,
+    val sender: Address? = null,
+    val replyTo: List<Address>,
+    val returnPath: Address? = null,
+    val tos: List<Address>,
+    val ccs: List<Address>,
     val date: Date,
     val references: List<String>,
     val bodyText: String? = null,
@@ -23,7 +23,7 @@ interface HeaderInterface {
     val value: String
 }
 
-data class Addr(
+data class Address(
     val name: String? = "",
     val email: String = ""
 )
@@ -42,13 +42,13 @@ data class ParseErrorHeader(
 data class MailboxHeader(
     override val name: String,
     override val value: String,
-    val address: Addr
+    val address: Address
 ) : HeaderInterface
 
 data class MailboxListHeader(
     override val name: String,
     override val value: String,
-    val addresses: List<Addr>
+    val addresses: List<Address>
 ) : HeaderInterface
 
 data class DateHeader(

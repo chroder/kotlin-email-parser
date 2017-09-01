@@ -14,7 +14,7 @@ buildscript {
 
 apply plugin: 'kotlin'
 apply plugin:'application'
-mainClassName = "io.nade.email_decoder.CmdKt"
+mainClassName = "io.nade.email.decoder.CmdKt"
 
 repositories {
     mavenCentral()

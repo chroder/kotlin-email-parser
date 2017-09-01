@@ -1,4 +1,4 @@
-package io.nade.email_decoder
+package io.nade.email.decoder
 
 import com.google.gson.GsonBuilder
 import java.io.FileInputStream
