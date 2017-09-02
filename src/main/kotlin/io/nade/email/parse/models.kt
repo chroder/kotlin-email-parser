@@ -15,8 +15,17 @@ data class ParsedMessage(
     val references: List<String>,
     val bodyText: String? = null,
     val bodyHtml: String? = null,
-    val headers: List<HeaderInterface>
-)
+    val headers: List<HeaderInterface>,
+    val size: Int = 0
+) {
+    fun getReadableSize(si: Boolean = true): String {
+        val unit = if (si) 1000 else 1024
+        if (size < unit) return size.toString() + " B"
+        val exp = (Math.log(size.toDouble()) / Math.log(unit.toDouble())).toInt()
+        val pre = (if (si) "kMGTPE" else "KMGTPE")[exp - 1] + if (si) "" else "i"
+        return String.format("%.1f %sB", size / Math.pow(unit.toDouble(), exp.toDouble()), pre)
+    }
+}
 
 interface HeaderInterface {
     val name: String

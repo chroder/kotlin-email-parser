@@ -4,6 +4,7 @@ import org.apache.james.mime4j.dom.MessageBuilder
 import org.apache.james.mime4j.field.LenientFieldParser
 import org.apache.james.mime4j.field.MailboxFieldLenientImpl
 import org.apache.james.mime4j.message.DefaultMessageBuilder
+import java.io.FileInputStream
 import java.io.InputStream
 import java.util.*
 
@@ -15,7 +16,8 @@ class Parser(private val msgBuilder: MessageBuilder) {
      * @return The decoded message
      */
     fun parse(istream: InputStream): ParsedMessage {
-        val parsedMessage = msgBuilder.parseMessage(istream)
+        val sizedIstream = SizeInputStream(istream)
+        val parsedMessage = msgBuilder.parseMessage(sizedIstream)
 
         val subject   = parsedMessage.subject ?: ""
         val messageId = parsedMessage.messageId ?: null
@@ -70,7 +72,8 @@ class Parser(private val msgBuilder: MessageBuilder) {
             references = references,
             bodyHtml = null,
             bodyText = null,
-            headers = headers
+            headers = headers,
+            size = sizedIstream.bytesRead
         )
     }
 
@@ -79,7 +82,7 @@ class Parser(private val msgBuilder: MessageBuilder) {
             val fieldParser = LenientFieldParser()
             fieldParser.setFieldParser("Return-Path", MailboxFieldLenientImpl.PARSER)
 
-            val msgBuilder = DefaultMessageBuilder();
+            val msgBuilder = DefaultMessageBuilder()
             msgBuilder.setFieldParser(fieldParser)
 
             return Parser(msgBuilder)

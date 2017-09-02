@@ -14,6 +14,7 @@ class DebugEncoder : EncoderInterface {
 
     override fun encodeToStream(msg: ParsedMessage, ostream: OutputStream) {
         val writer = OutputStreamWriter(ostream, StandardCharsets.UTF_8)
+        writer.appendln("Message Size: %s".format(msg.getReadableSize()))
         writer.appendln("Subject: %s".format(msg.subject))
         writer.appendln("From: %s".format(msg.from?.toString() ?: ""))
         if (msg.tos.isNotEmpty()) {
