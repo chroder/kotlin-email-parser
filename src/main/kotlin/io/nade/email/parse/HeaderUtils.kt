@@ -111,6 +111,12 @@ object HeaderUtils {
             return ParseErrorHeader(name, value, field.parseException.message ?: "Unknown")
         }
 
+        // DateTimeFieldLenientImpl doesnt raise any errors,
+        // it just returns a null date
+        if (field is DateTimeField && field.date == null) {
+            return ParseErrorHeader(name, value, "Invalid date format")
+        }
+
         return when (field) {
             is DateTimeField    -> DateHeader(name, value, field.date)
             is AddressListField -> MailboxListHeader(name, value, mailboxListToAddrList(field.addressList))

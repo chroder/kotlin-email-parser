@@ -1,8 +1,8 @@
 Return-Path: return@path.com
-Date: Wed, 20 Dec 30 19:59 CST
+Date: Thu, 17 Aug 2017 13:18:33 +0100
 From: from@email.com
-To: to@email.com
-Cc: cc@email.com, cc2@email.com
+To: to@email.com, Name <to2@email.com>
+Cc: Name <cc@email.com>, cc2@email.com
 Subject: Test Subject
 
 This is a test email.

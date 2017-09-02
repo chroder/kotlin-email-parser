@@ -9,7 +9,7 @@ class DecodeTest {
 
     @ParameterizedTest
     @CsvFileSource(resources = arrayOf("/test-emails.csv"))
-    fun testConstruct(inputEmailFile: String, expectedOutputFile: String) {
+    fun testEmails(inputEmailFile: String, expectedOutputFile: String) {
         logger.debug { "Reading from: $inputEmailFile, expected results file: $expectedOutputFile" }
     }
 }

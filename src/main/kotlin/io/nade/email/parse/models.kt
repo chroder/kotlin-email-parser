@@ -11,7 +11,7 @@ data class ParsedMessage(
     val returnPath: Address? = null,
     val tos: List<Address>,
     val ccs: List<Address>,
-    val date: Date,
+    val date: Date?,
     val references: List<String>,
     val bodyText: String? = null,
     val bodyHtml: String? = null,

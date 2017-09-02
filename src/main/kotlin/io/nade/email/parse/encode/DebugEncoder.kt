@@ -4,6 +4,7 @@ import io.nade.email.parse.ParsedMessage
 import java.io.OutputStream
 import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
+import java.text.SimpleDateFormat
 
 class DebugEncoder : EncoderInterface {
     companion object {
@@ -16,6 +17,9 @@ class DebugEncoder : EncoderInterface {
         val writer = OutputStreamWriter(ostream, StandardCharsets.UTF_8)
         writer.appendln("Message Size: %s".format(msg.getReadableSize()))
         writer.appendln("Subject: %s".format(msg.subject))
+        if (msg.date != null) {
+            writer.appendln("Date: %s".format(SimpleDateFormat("yyyyy-mm-dd hh:mm:ss").format(msg.date)))
+        }
         writer.appendln("From: %s".format(msg.from?.toString() ?: ""))
         if (msg.tos.isNotEmpty()) {
             writer.appendln("To: %s".format(msg.tos.joinToString(", ") { it.toString() }))

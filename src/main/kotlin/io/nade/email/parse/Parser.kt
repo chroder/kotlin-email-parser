@@ -1,9 +1,11 @@
 package io.nade.email.parse
 
-import org.apache.james.mime4j.dom.MessageBuilder
+import org.apache.commons.io.IOUtils
+import org.apache.james.mime4j.dom.*
 import org.apache.james.mime4j.field.LenientFieldParser
 import org.apache.james.mime4j.field.MailboxFieldLenientImpl
 import org.apache.james.mime4j.message.DefaultMessageBuilder
+import java.io.ByteArrayOutputStream
 import java.io.FileInputStream
 import java.io.InputStream
 import java.util.*
@@ -55,9 +57,45 @@ class Parser(private val msgBuilder: MessageBuilder) {
         val returnPathField = parsedMessage.header.getField("Return-Path")
         val returnPath      = if (returnPathField != null) HeaderUtils.getReturnPathAddr(returnPathField) else null
 
-        val date       = HeaderUtils.guessDateFromMessage(parsedMessage) ?: Date()
+        val date       = HeaderUtils.guessDateFromMessage(parsedMessage)
         val headers    = parsedMessage.header.fields.map { HeaderUtils.fieldToHeader(it) }
         val references = HeaderUtils.parseReferences(parsedMessage.header.getFields("References"))
+
+        val textParts: MutableList<String> = mutableListOf()
+        val htmlParts: MutableList<String> = mutableListOf()
+
+        walkParts(parsedMessage) { part ->
+            // - we dont care about processing multi-parts which are essentially containers
+            // for the real parts we want to read. So we have this condition to ignore them
+            // and only process actual parts.
+            if (!part.isMultipart) {
+                val disposition = part.dispositionType
+                var filename    = part.filename
+                val mimeType    = part.mimeType
+                val contentId   = part.parent?.header?.getField("Content-Id")?.body?.toString() ?: null
+                val body        = part.body
+
+                // A body part is any text part that has no disposition
+                // And we also handle the edge-case where the disposition is inline, but it's not a
+                // a file (no filename, no content-id) which is something some clients do sometimes
+                // when they feel like it
+                if (body is TextBody && (
+                    disposition == null
+                    || (disposition == "inline" && filename == null && contentId == null)
+                )) {
+                    if (mimeType == "text/html") {
+                        htmlParts.add(IOUtils.toString(body.reader))
+                    } else {
+                        textParts.add(IOUtils.toString(body.reader))
+                    }
+                } else {
+                    TODO("Save the part as an attachment")
+                }
+            }
+        }
+
+        val bodyHtml = if (htmlParts.isNotEmpty()) htmlParts.joinToString("").replace("\r\n", "\n").replace("\r", "\n") else null
+        val bodyText = if (textParts.isNotEmpty()) textParts.joinToString("\n").replace("\r\n", "\n").replace("\r", "\n") else null
 
         return ParsedMessage(
             subject = subject,
@@ -70,11 +108,32 @@ class Parser(private val msgBuilder: MessageBuilder) {
             ccs = ccAddress,
             date = date,
             references = references,
-            bodyHtml = null,
-            bodyText = null,
+            bodyHtml = bodyHtml,
+            bodyText = bodyText,
             headers = headers,
             size = sizedIstream.bytesRead
         )
+    }
+
+    private fun walkParts(message: Entity, block: (b: Entity) -> Unit) {
+        val body = message.body
+        when (body) {
+            is Multipart -> {
+                block(message)
+                for (sub in body.bodyParts) {
+                    walkParts(sub, block)
+                }
+            }
+
+            is SingleBody -> {
+                block(message)
+            }
+
+            is Message -> {
+                block(message)
+                walkParts(message, block)
+            }
+        }
     }
 
     companion object {
