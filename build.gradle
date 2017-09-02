@@ -1,4 +1,4 @@
-group 'io.nade.email.decoder'
+group 'io.nade.email.parse'
 version '1.0-SNAPSHOT'
 
 buildscript {

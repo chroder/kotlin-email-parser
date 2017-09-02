@@ -9,7 +9,12 @@ import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Option
 import java.io.File
 
-class ParseEmailCommand(private val file: File, private val format: FormatOption) {
+class ParseEmailCommand(
+    private val format: FormatOption,
+    private val file: File,
+    private val outFile: File?,
+    private val isVerbose: Boolean = false
+) {
 
     fun run() {
         val parser = Parser.create()
@@ -20,7 +25,11 @@ class ParseEmailCommand(private val file: File, private val format: FormatOption
             FormatOption.JSON  -> JsonEncoder.create()
         }
 
-        encoder.encodeToOutput(message)
+        if (outFile != null) {
+            encoder.encodeToStream(message, outFile.outputStream())
+        } else {
+            encoder.encodeToOutput(message)
+        }
     }
 
     companion object {
@@ -34,6 +43,12 @@ class ParseEmailCommand(private val file: File, private val format: FormatOption
             val fOpt = Option("f", "file", true, "Required. The path to the email file.")
             fOpt.argName = "FILE"
             options.addOption(fOpt)
+
+            val foOpt = Option("o", "outfile", true, "Optionally a file to save the contents to.")
+            foOpt.argName = "FILE"
+            options.addOption(foOpt)
+
+            options.addOption("v", "verbose", false, "Output debug log information to STDERR while parsing.")
 
             val cmd = try {
                 parser.parse(options, args)
@@ -80,7 +95,18 @@ class ParseEmailCommand(private val file: File, private val format: FormatOption
                 return
             }
 
-            ParseEmailCommand(fileOption, formatOption).run()
+            val outfileOption = if (cmd.hasOption("o")) {
+                File(cmd.getOptionValue("o"))
+            } else {
+                null
+            }
+
+            ParseEmailCommand(
+                formatOption,
+                fileOption,
+                outfileOption,
+                cmd.hasOption("v")
+            ).run()
         }
     }
 }

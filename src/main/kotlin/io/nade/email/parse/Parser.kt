@@ -68,8 +68,8 @@ class Parser(private val msgBuilder: MessageBuilder) {
             ccs = ccAddress,
             date = date,
             references = references,
-            bodyHtml = "",
-            bodyText = "",
+            bodyHtml = null,
+            bodyText = null,
             headers = headers
         )
     }

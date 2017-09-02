@@ -1,8 +1,9 @@
 Email Decoder
 =============
 
-This project aims to take any valid raw email message ([RFC 5322](https://tools.ietf.org/html/rfc5322), 2822, 822)
-message and transform it into a _simple data structure_.
+This project aims to take any raw email message ([RFC 5322](https://tools.ietf.org/html/rfc5322), 2822, 822)
+message and transform it into a _simple data structure_ with outputs to JSON or MsgPack
+(or anything else if you implement an ecoder).
 
 The data structures output from this library simplify email parsing for the most common use cases including:
 
@@ -25,7 +26,7 @@ as you write apps to consume, say, a REST API.
 **What do you mean "opinioned" data structure?**
 
 Email is very flexible, and that makes it very complicated. There are many things which are technically possible to
-do with email but are never done in practice. This project ignores errs on the side of practical.
+do with email but are never done in practice. This project errs on the side of practical.
 
 Here are a few examples:
 
@@ -37,8 +38,32 @@ complications. An email address is always the same shape no matter what it is (F
 Another exmaple is how we attempt to detect the "Date" based on Recieved headers if there is no Date.
 * We simplify parsing out the body html/text, even in convuluted multipart email messages.
 
-Example Result
---------------
+The library handles parsing emails and then sorts the various pieces into a structure you can use in real-world
+applications.
+
+Example CLI Usage
+-----------------
+
+```bash
+$ ./io.nade.email.parse -m json --file my-email.eml
+# json output (see below for an example)
+```
+
+Example Library Usage
+---------------------
+
+```kotlin
+val file    = File("my-email.eml")
+val parser  = Parser.create()
+val message = parser.parse(file.inputStream())
+
+val outFile = File("email.json")
+val encoder = JsonEncoder.create()
+encoder.encodeToStream(message, outFile.outputStream())
+```
+
+Example JSON Result
+-------------------
 
 ```json
 {
