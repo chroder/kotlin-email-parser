@@ -1,6 +1,8 @@
 Email Decoder
 =============
 
+[![Build Status](https://travis-ci.org/chroder/kotlin-email-parser.svg?branch=master)](https://travis-ci.org/chroder/kotlin-email-parser)
+
 This project aims to take any raw email message ([RFC 5322](https://tools.ietf.org/html/rfc5322), 2822, 822)
 message and transform it into a _simple data structure_ with outputs to JSON or MsgPack
 (or anything else if you implement an ecoder).
