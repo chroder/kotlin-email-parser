@@ -17,7 +17,7 @@ class ParseEmailCommand(
 ) {
 
     fun run() {
-        val parser = Parser.create()
+        val parser = Parser()
         val message = parser.parse(file.inputStream())
 
         val encoder = when (format) {

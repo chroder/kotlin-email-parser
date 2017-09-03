@@ -1,6 +1,6 @@
 package io.nade.email.parse.test
 
-import io.nade.email.parse.Address
+import io.nade.email.parse.Addr
 import io.nade.email.parse.ParsedMessage
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
@@ -13,18 +13,18 @@ class DecodeSimpleTest {
         assertNotNull(message.date)
         assertEquals(1502972313000, message.date!!.time)
 
-        assertEquals(Address(null, "from@email.com"), message.from)
+        assertEquals(Addr(null, "from@email.com"), message.from)
 
         assertEquals(2, message.tos.size)
-        assertEquals(Address(null, "to@email.com"), message.tos[0])
-        assertEquals(Address("Name", "to2@email.com"), message.tos[1])
+        assertEquals(Addr(null, "to@email.com"), message.tos[0])
+        assertEquals(Addr("Name", "to2@email.com"), message.tos[1])
 
         assertEquals(2, message.ccs.size)
-        assertEquals(Address("Name", "cc@email.com"), message.ccs[0])
-        assertEquals(Address(null, "cc2@email.com"), message.ccs[1])
+        assertEquals(Addr("Name", "cc@email.com"), message.ccs[0])
+        assertEquals(Addr(null, "cc2@email.com"), message.ccs[1])
 
-//        assertNotNull(message.returnPath)
-//        assertEquals(message.returnPath, Address(nul, "return@path.com"))
+        assertNotNull(message.returnPath)
+        assertEquals(message.returnPath, Addr(null, "return@path.com"))
     }
 
     @Test

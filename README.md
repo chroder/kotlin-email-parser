@@ -32,10 +32,10 @@ do with email but are never done in practice. This project errs on the side of p
 
 Here are a few examples:
 
-* An email may technically be From multiple addresses, but we simplify this and assume there's only one.
-* According to the spec, there is a difference between mailboxes, mailbox lists, addresses, and address lists; and
+* An email may technically be From multiple addrs, but we simplify this and assume there's only one.
+* According to the spec, there is a difference between mailboxes, mailbox lists, addrs, and addr lists; and
 there are esoteric features of mailbox lists that are seldom used in practice (e.g. grouping). We do away with these
-complications. An email address is always the same shape no matter what it is (From, To, Sender, Reply-To, whatever).
+complications. An email addr is always the same shape no matter what it is (From, To, Sender, Reply-To, whatever).
 * We try to normalise and parse common headers into usable data structures. For example, dates are parsed into UTC ISO 8601 dates.
 Another exmaple is how we attempt to detect the "Date" based on Recieved headers if there is no Date.
 * We simplify parsing out the body html/text, even in convuluted multipart email messages.
@@ -122,7 +122,7 @@ Example JSON Result
     {
       "name": "From",
       "value": "John Doe \u003cjohn@example.com\u003e",
-      "addresses": [
+      "addrs": [
         {
           "name": "John Doe",
           "email": "john@example.com"
@@ -132,7 +132,7 @@ Example JSON Result
     {
       "name": "To",
       "value": "Jane Doe \u003cjane@example.com\u003e",
-      "addresses": [
+      "addrs": [
         {
           "name": "Jane Doe",
           "email": "jane@example.com"

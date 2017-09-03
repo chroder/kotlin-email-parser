@@ -6,7 +6,7 @@ import java.io.File
 import java.io.InputStream
 
 fun parseFile(istream: InputStream): ParsedMessage {
-    val parser = Parser.create()
+    val parser = Parser()
     return parser.parse(istream)
 }
 

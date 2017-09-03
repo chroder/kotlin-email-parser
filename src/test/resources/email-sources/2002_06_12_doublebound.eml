@@ -136,7 +136,7 @@ Some of Mutt's features include:
     </li><li>Delivery Status Notification (DSN) support
     </li><li>postpone message composition indefinetly for later recall
     </li><li>easily include attachments when composing, even from the command line
-    </li><li>ability to specify alternate addresses for recognition of mail 
+    </li><li>ability to specify alternate addrs for recognition of mail
         forwarded from other accounts, with ability to set the From: headers
         on replies/etc. accordingly
     </li><li>multiple message tagging
@@ -222,12 +222,12 @@ but is now developed and maintained by the members of the Mutt development
 <p>
 <a href="#">top</a>
 </p><p></p><hr>
-<address>Last updated on March 13, 2002 by
+<addr>Last updated on March 13, 2002 by
   <a href="http://jblosser.firinn.org/">Jeremy Blosser</a>.
-</address>
+</addr>
 URL:&lt;http://www.mutt.org/index.html&gt;<br>
-Copyright © 1996-9 Michael R. Elkins.  All rights reserved.<br>
-Copyright © 1999-2002 Jeremy Blosser.  All rights reserved.
+Copyright ï¿½ 1996-9 Michael R. Elkins.  All rights reserved.<br>
+Copyright ï¿½ 1999-2002 Jeremy Blosser.  All rights reserved.
 <hr>
 <!-- BEGIN HOSTED BY -->
 <a href="http://www.gbnet.net/"><img src="The%20Mutt%20E-Mail%20Client_files/gbnettek_w100_transb.gif" width="100" height="64" alt="GBNet/NetTek" border="0" vspace="10"></a>

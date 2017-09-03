@@ -3,14 +3,14 @@ package io.nade.email.parse
 import java.util.*
 
 data class ParsedMessage(
-    val subject: String = "",
-    val messageId: String? = "",
-    val from: Address? = null,
-    val sender: Address? = null,
-    val replyTo: List<Address>,
-    val returnPath: Address? = null,
-    val tos: List<Address>,
-    val ccs: List<Address>,
+    val subject: String,
+    val messageId: String? = null,
+    val from: Addr? = null,
+    val sender: Addr? = null,
+    val replyTo: List<Addr>,
+    val returnPath: Addr? = null,
+    val tos: List<Addr>,
+    val ccs: List<Addr>,
     val date: Date?,
     val references: List<String>,
     val bodyText: String? = null,
@@ -32,9 +32,9 @@ interface HeaderInterface {
     val value: String
 }
 
-data class Address(
+data class Addr(
     val name: String? = "",
-    val email: String = ""
+    val email: String
 ) {
     override fun toString(): String {
         if (name != null) {
@@ -59,13 +59,13 @@ data class ParseErrorHeader(
 data class MailboxHeader(
     override val name: String,
     override val value: String,
-    val address: Address
+    val addr: Addr
 ) : HeaderInterface
 
 data class MailboxListHeader(
     override val name: String,
     override val value: String,
-    val addresses: List<Address>
+    val addrs: List<Addr>
 ) : HeaderInterface
 
 data class DateHeader(
