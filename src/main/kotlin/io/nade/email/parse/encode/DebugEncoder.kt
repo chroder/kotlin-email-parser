@@ -18,7 +18,7 @@ class DebugEncoder : EncoderInterface {
         writer.appendln("Message Size: %s".format(msg.getReadableSize()))
         writer.appendln("Subject: %s".format(msg.subject))
         if (msg.date != null) {
-            writer.appendln("Date: %s".format(SimpleDateFormat("yyyyy-mm-dd hh:mm:ss").format(msg.date)))
+            writer.appendln("Date: %s".format(SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(msg.date)))
         }
         writer.appendln("From: %s".format(msg.from?.toString() ?: ""))
         if (msg.tos.isNotEmpty()) {

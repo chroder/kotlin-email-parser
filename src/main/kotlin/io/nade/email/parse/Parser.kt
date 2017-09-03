@@ -1,12 +1,14 @@
 package io.nade.email.parse
 
-import mu.KLoggable
+import mu.KotlinLogging
 import org.apache.commons.io.IOUtils
 import org.apache.james.mime4j.dom.*
 import org.apache.james.mime4j.field.LenientFieldParser
 import org.apache.james.mime4j.field.MailboxFieldLenientImpl
 import org.apache.james.mime4j.message.DefaultMessageBuilder
+import org.slf4j.MDC
 import java.io.InputStream
+import java.util.*
 
 class Parser {
     /**
@@ -28,8 +30,10 @@ class Parser {
         val sizedIstream = SizeInputStream(istream)
         val parsedMessage = msgBuilder.parseMessage(sizedIstream)
 
+        val messageId = parsedMessage.messageId ?: null
+        logger.debug("messageID = ${messageId ?: "null"}")
+
         val subject                  = parsedMessage.subject ?: ""
-        val messageId                = parsedMessage.messageId ?: null
         val fromAddr: Addr?          = parsedMessage.from?.toAddrList()?.first()
         val senderAddr: Addr?        = parsedMessage.sender?.toAddr()
         val replyToAddrs: List<Addr> = parsedMessage.replyTo?.toAddrList() ?: listOf()
@@ -71,7 +75,7 @@ class Parser {
                         textParts.add(IOUtils.toString(body.reader))
                     }
                 } else {
-                    TODO("Save the part as an attachment")
+                    //TODO
                 }
             }
         }
@@ -97,8 +101,37 @@ class Parser {
         )
     }
 
-    companion object: KLoggable {
-        override val logger = logger()
+    fun parseToResult(istream: InputStream, msgBuilder: MessageBuilder): ParseResult {
+        val contextId = UUID.randomUUID().toString()
+        var exception: Exception? = null
+        val logLines: String
+
+        MDC.put("emailParserContextId", contextId)
+        val message = try {
+            parse(istream, msgBuilder)
+        } catch (e: Exception) {
+            logger.error("Exception while parsing: [${e.javaClass}] ${e.message}")
+            exception = e
+            null
+        } finally {
+            MDC.remove("emailParserContextId")
+
+            logLines = ContextLogger.getLogLines(contextId).toLogString()
+            ContextLogger.clearContext(contextId)
+        }
+
+        return ParseResult(
+            message = message,
+            log = logLines,
+            exception = exception,
+            contextId = contextId
+        )
+    }
+
+    fun parseToResult(istream: InputStream): ParseResult = parseToResult(istream, createDefaultMessageBuilder())
+
+    companion object {
+        val logger = ContextLogger(KotlinLogging.logger{})
 
         fun createDefaultMessageBuilder(): MessageBuilder {
             val fieldParser = LenientFieldParser()

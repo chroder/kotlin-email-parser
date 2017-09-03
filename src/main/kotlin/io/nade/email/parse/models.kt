@@ -2,6 +2,13 @@ package io.nade.email.parse
 
 import java.util.*
 
+data class ParseResult(
+    val message: ParsedMessage?,
+    val log: String,
+    val exception: Exception?,
+    val contextId: String
+)
+
 data class ParsedMessage(
     val subject: String,
     val messageId: String? = null,

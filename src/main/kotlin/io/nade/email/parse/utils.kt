@@ -15,7 +15,7 @@ import java.io.StringReader
 import java.lang.Exception
 import java.util.*
 
-val logger = KotlinLogging.logger {  }
+val logger = ContextLogger(KotlinLogging.logger{})
 
 /**
  * Create an Addr model from a Mailbox field.
@@ -68,13 +68,17 @@ fun fieldToHeader(field: Field): HeaderInterface {
     val value = field.body ?: ""
 
     if (field is ParsedField && !field.isValidField) {
-        return ParseErrorHeader(name, value, field.parseException.message ?: "Unknown")
+        val errMsg = field.parseException.message ?: "Unknown"
+        logger.info("Invalid Field<${field.javaClass}>: $errMsg")
+        return ParseErrorHeader(name, value, errMsg)
     }
 
     // DateTimeFieldLenientImpl doesnt raise any errors,
     // it just returns a null date
     if (field is DateTimeField && field.date == null) {
-        return ParseErrorHeader(name, value, "Invalid date format")
+        val errMsg = field.parseException.message ?: "Invalid date format"
+        logger.info("Invalid Field<${field.javaClass}>: $errMsg")
+        return ParseErrorHeader(name, value, errMsg)
     }
 
     return when (field) {
@@ -107,28 +111,28 @@ fun parseReferences(fields: List<Field>): List<String> {
  */
 fun guessDateFromMessage(msg: Message): Date? {
     if (msg.date != null) {
-        logger.debug { "guessDateFromMessage on ${msg.messageId ?: msg.hashCode()}: using msg.date" }
+        logger.debug("guessDateFromMessage on ${msg.messageId ?: msg.hashCode()}: using msg.date")
         return msg.date
     }
 
     val rec = msg.header.getField("Received")?.body
     if (rec == null) {
-        logger.debug { "guessDateFromMessage on ${msg.messageId ?: msg.hashCode()}: no Received header" }
+        logger.debug("guessDateFromMessage on ${msg.messageId ?: msg.hashCode()}: no Received header")
         return null
     }
 
     val parts = rec.split(';', limit = 2)
     if (parts.size != 2) {
-        logger.debug { "guessDateFromMessage on ${msg.messageId ?: msg.hashCode()}: unknown format on Received header" }
+        logger.debug("guessDateFromMessage on ${msg.messageId ?: msg.hashCode()}: unknown format on Received header")
         return null
     }
 
     val dateStr = parts[1]
     return try {
-        logger.debug { "guessDateFromMessage on ${msg.messageId ?: msg.hashCode()}: parsing date from: $dateStr" }
+        logger.debug("guessDateFromMessage on ${msg.messageId ?: msg.hashCode()}: parsing date from: $dateStr")
         DateTimeParser(StringReader(dateStr)).parseAll().date
     } catch (e: Exception) {
-        logger.debug { "guessDateFromMessage on ${msg.messageId ?: msg.hashCode()}: failed to parse: $dateStr" }
+        logger.debug("guessDateFromMessage on ${msg.messageId ?: msg.hashCode()}: failed to parse: $dateStr")
         null
     }
 }
@@ -147,26 +151,26 @@ fun guessDateFromMessage(msg: Message): Date? {
 fun getReturnPathAddr(field: Field): Addr? {
     if (field is MailboxField) {
         return if (field.mailbox != null) {
-            logger.debug { "getReturnPathAddr: got from mailbox" }
+            logger.debug("getReturnPathAddr: got from mailbox")
             mailboxToAddr(field.mailbox)
         } else {
-            logger.debug { "getReturnPathAddr: return path mailbox is null" }
+            logger.debug("getReturnPathAddr: return path mailbox is null")
             null
         }
     }
 
     val body = field.body
     if (body == null) {
-        logger.debug { "getReturnPathAddr: no valid return path: ${field.javaClass}: null" }
+        logger.debug("getReturnPathAddr: no valid return path: ${field.javaClass}: null")
     }
 
     if (body == "<>") {
-        logger.debug { "getReturnPathAddr: return path is $body, making special Addr with <>" }
+        logger.debug("getReturnPathAddr: return path is $body, making special Addr with <>")
         // special no return value should be kept
         return Addr("NORETURN", "<>")
     }
 
-    logger.debug { "getReturnPathAddr: no valid return path: ${field.javaClass}: $body" }
+    logger.debug("getReturnPathAddr: no valid return path: ${field.javaClass}: $body")
     return null
 }
 

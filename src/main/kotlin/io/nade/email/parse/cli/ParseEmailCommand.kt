@@ -18,7 +18,23 @@ class ParseEmailCommand(
 
     fun run() {
         val parser = Parser()
-        val message = parser.parse(file.inputStream())
+        val result = parser.parseToResult(file.inputStream())
+
+        if (result.message == null) {
+            println("There was a problem parsing the message")
+            if (result.exception != null) {
+                println(result.exception.toString())
+            }
+            println(result.log)
+            System.exit(2)
+            return
+        }
+
+        if (isVerbose) {
+            println(result.log)
+        }
+
+        val message = result.message
 
         val encoder = when (format) {
             FormatOption.DEBUG -> DebugEncoder.create()
