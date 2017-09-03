@@ -23,6 +23,7 @@ data class ParsedMessage(
     val bodyText: String? = null,
     val bodyHtml: String? = null,
     val headers: List<HeaderInterface>,
+    val hints: List<MessageHint>,
     val size: Int = 0
 ) {
     fun getReadableSize(si: Boolean = true): String {
@@ -32,6 +33,10 @@ data class ParsedMessage(
         val pre = (if (si) "kMGTPE" else "KMGTPE")[exp - 1] + if (si) "" else "i"
         return String.format("%.1f %sB", size / Math.pow(unit.toDouble(), exp.toDouble()), pre)
     }
+}
+
+enum class MessageHint {
+    IS_AUTO, IS_OOO, IS_FORWARD, IS_REPLY
 }
 
 interface HeaderInterface {

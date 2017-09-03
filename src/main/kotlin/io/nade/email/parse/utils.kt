@@ -1,5 +1,6 @@
 package io.nade.email.parse
 
+import com.sun.org.apache.xpath.internal.operations.Bool
 import mu.KotlinLogging
 import org.apache.james.mime4j.dom.Entity
 import org.apache.james.mime4j.dom.Message
@@ -9,6 +10,7 @@ import org.apache.james.mime4j.dom.address.AddressList
 import org.apache.james.mime4j.dom.address.Mailbox
 import org.apache.james.mime4j.dom.address.MailboxList
 import org.apache.james.mime4j.dom.field.*
+import org.apache.james.mime4j.dom.Header as DomHeader
 import org.apache.james.mime4j.field.datetime.parser.DateTimeParser
 import org.apache.james.mime4j.stream.Field
 import java.io.StringReader
@@ -198,5 +200,98 @@ fun walkMessageParts(message: Entity, block: (b: Entity) -> Unit) {
             block(message)
             walkMessageParts(message, block)
         }
+    }
+}
+
+/**
+ * Guess is a message was an automatic message or auto-response. These
+ * are messages which we typically don't want to send our own auto-replies to.
+ */
+fun guessIsAutoMessage(msg: Message): Boolean {
+    if (msg.header.hasHeaderEqual("Preference", "auto_reply")) {
+        return true
+    }
+
+    if (
+        msg.header.hasHeaderEqual("Auto-Submitted", "auto-replied")
+        || msg.header.hasHeaderEqual("X-Autoreply", "yes")
+    ) {
+        return true
+    }
+
+    if (msg.header.hasHeaderEqual("X-POST-MessageClass", "9; Autoresponder")) {
+        return true
+    }
+
+    if (
+        msg.header.hasHeader("X-Autorespond")
+        || msg.header.hasHeader("X-AutoReply-From")
+        || msg.header.hasHeader("X-Mail-Autoreply")
+        || msg.header.hasHeader("X-FC-MachineGenerated")
+    ) {
+        return true
+    }
+
+    if (msg.header.hasHeaderEqual("Delivered-To", "Autoresponder")) {
+        return true;
+    }
+
+    if (msg.header.hasHeader("Auto-Submitted") && !msg.header.hasHeaderEqual("Auto-Submitted", "no")) {
+        return true
+    }
+
+    if (msg.header.hasHeader("X-Cron-Env")) {
+        return true
+    }
+
+    if (msg.header.hasHeaderEqual("X-Auto-Response-Suppress", "OOF")) {
+        return true
+    }
+
+    listOf("junk", "bulk", "list", "auto_reply").forEach {
+        if (msg.header.hasHeaderEqual("Precedence", it) || msg.header.hasHeaderEqual("X-Precedence", it)) {
+            return true
+        }
+    }
+
+    return false
+}
+
+/**
+ * Try to guess based on the subject of a message if it's an OOF reply.
+ * Usually used with guessIsAutoMessage to detect OOO replies.
+ */
+fun guessIsOooSubject(subject: String): Boolean {
+    val s = subject.toLowerCase()
+    return s.startsWith("out of office:")
+        || s.startsWith("out of the office:")
+        || s.startsWith("out of office autoreply:")
+        || s.startsWith("out of office reply:")
+        || s.startsWith("automatic reply:")
+        || s.endsWith("is out of the office")
+}
+
+fun guessIsReply(msg: Message): Boolean {
+    if (msg.header.getFields("References").isNotEmpty()) {
+        return true
+    }
+
+    val s = msg.subject.toLowerCase()
+    return s.matches("^re:".toRegex())
+}
+
+fun guessIsForward(msg: Message): Boolean {
+    val s = msg.subject.toLowerCase()
+    return s.matches("^(fwd|fw):".toRegex())
+}
+
+fun DomHeader.hasHeader(name: String): Boolean = this.getField(name) != null
+
+fun DomHeader.hasHeaderEqual(name: String, value: String, icase: Boolean = true): Boolean {
+    if (icase) {
+        val lowerValue = value.toLowerCase()
+        return this.getFields(name).any { it.body != null && it.body.toLowerCase() == lowerValue }
+    } else {
+        return this.getFields(name).any { it.body == value }
     }
 }

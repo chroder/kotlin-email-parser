@@ -50,6 +50,27 @@ class Parser {
         val textParts: MutableList<String> = mutableListOf()
         val htmlParts: MutableList<String> = mutableListOf()
 
+        val hints: MutableList<MessageHint> = mutableListOf()
+        if (guessIsAutoMessage(parsedMessage)) {
+            logger.info("Guessed message is an auto reply")
+            hints.add(MessageHint.IS_AUTO)
+
+            if (guessIsOooSubject(subject)) {
+                logger.info("Guessed message is an OOO reply")
+                hints.add(MessageHint.IS_OOO)
+            }
+        }
+
+        if (guessIsReply(parsedMessage)) {
+            logger.info("Guessed message is a reply")
+            hints.add(MessageHint.IS_REPLY)
+        }
+
+        if (guessIsForward(parsedMessage)) {
+            logger.info("Guessed message is a forward")
+            hints.add(MessageHint.IS_FORWARD)
+        }
+
         walkMessageParts(parsedMessage) { part ->
             // - we dont care about processing multi-parts which are essentially containers
             // for the real parts we want to read. So we have this condition to ignore them
@@ -97,6 +118,7 @@ class Parser {
             bodyHtml = bodyHtml,
             bodyText = bodyText,
             headers = headers,
+            hints = hints.toList(),
             size = sizedIstream.bytesRead
         )
     }
