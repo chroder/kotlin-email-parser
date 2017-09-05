@@ -1,2 +1,5 @@
+include 'lib'
+include 'cli'
+
 rootProject.name = 'io.nade.email.parse'
 
