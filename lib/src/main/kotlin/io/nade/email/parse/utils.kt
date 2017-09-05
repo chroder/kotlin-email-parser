@@ -1,7 +1,5 @@
 package io.nade.email.parse
 
-import com.sun.org.apache.xpath.internal.operations.Bool
-import mu.KotlinLogging
 import org.apache.james.mime4j.dom.Entity
 import org.apache.james.mime4j.dom.Message
 import org.apache.james.mime4j.dom.Multipart
@@ -10,14 +8,15 @@ import org.apache.james.mime4j.dom.address.AddressList
 import org.apache.james.mime4j.dom.address.Mailbox
 import org.apache.james.mime4j.dom.address.MailboxList
 import org.apache.james.mime4j.dom.field.*
-import org.apache.james.mime4j.dom.Header as DomHeader
 import org.apache.james.mime4j.field.datetime.parser.DateTimeParser
 import org.apache.james.mime4j.stream.Field
+import org.slf4j.LoggerFactory
 import java.io.StringReader
 import java.lang.Exception
 import java.util.*
+import org.apache.james.mime4j.dom.Header as DomHeader
 
-val logger = ContextLogger(KotlinLogging.logger{})
+val logger = ContextLogger(LoggerFactory.getLogger(Parser::class.java))
 
 /**
  * Create an Addr model from a Mailbox field.

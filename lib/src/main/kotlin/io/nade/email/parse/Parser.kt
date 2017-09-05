@@ -1,11 +1,12 @@
 package io.nade.email.parse
 
-import mu.KotlinLogging
 import org.apache.commons.io.IOUtils
-import org.apache.james.mime4j.dom.*
+import org.apache.james.mime4j.dom.MessageBuilder
+import org.apache.james.mime4j.dom.TextBody
 import org.apache.james.mime4j.field.LenientFieldParser
 import org.apache.james.mime4j.field.MailboxFieldLenientImpl
 import org.apache.james.mime4j.message.DefaultMessageBuilder
+import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import java.io.InputStream
 import java.util.*
@@ -153,7 +154,7 @@ class Parser {
     fun parseToResult(istream: InputStream): ParseResult = parseToResult(istream, createDefaultMessageBuilder())
 
     companion object {
-        val logger = ContextLogger(KotlinLogging.logger{})
+        val logger = ContextLogger(LoggerFactory.getLogger(Parser::class.java))
 
         fun createDefaultMessageBuilder(): MessageBuilder {
             val fieldParser = LenientFieldParser()

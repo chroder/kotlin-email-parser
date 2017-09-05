@@ -20,7 +20,6 @@ repositories {
 dependencies {
     compile project(':lib')
     compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jre8', version: "$kotlin_version"
-    compile group: 'io.github.microutils', name: 'kotlin-logging', version: '1.4.6'
 }
 
 compileKotlin {
