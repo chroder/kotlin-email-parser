@@ -3,6 +3,7 @@ package io.nade.email.parse.cli
 import io.nade.email.parse.Parser
 import io.nade.email.parse.encode.DebugEncoder
 import io.nade.email.parse.encode.JsonEncoder
+import io.nade.email.parse.encode.MsgPackEncoder
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
 import org.apache.commons.cli.HelpFormatter
@@ -37,8 +38,9 @@ class ParseEmailCommand(
         val message = result.message
 
         val encoder = when (format) {
-            FormatOption.DEBUG -> DebugEncoder.create()
-            FormatOption.JSON  -> JsonEncoder.create()
+            FormatOption.DEBUG   -> DebugEncoder.create()
+            FormatOption.JSON    -> JsonEncoder.create()
+            FormatOption.MSGPACK -> MsgPackEncoder.create()
         }
 
         if (outFile != null) {
@@ -53,7 +55,7 @@ class ParseEmailCommand(
             val parser = DefaultParser()
 
             val options = Options()
-            options.addOption("m", "format", true, "The format to use: json, debug. Defaults to debug.")
+            options.addOption("m", "format", true, "The format to use: json, msgpack, debug. Defaults to debug.")
             options.addOption("h", "help", false, "Show help message")
 
             val fOpt = Option("f", "file", true, "Required. The path to the email file.")
@@ -128,5 +130,5 @@ class ParseEmailCommand(
 }
 
 enum class FormatOption {
-    JSON, DEBUG
+    DEBUG, JSON, MSGPACK
 }
