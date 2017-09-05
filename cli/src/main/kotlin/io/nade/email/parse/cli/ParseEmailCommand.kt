@@ -42,9 +42,9 @@ class ParseEmailCommand(
         }
 
         if (outFile != null) {
-            encoder.encodeToStream(message, outFile.outputStream())
+            encoder.encodeToStream(message!!, outFile.outputStream())
         } else {
-            encoder.encodeToOutput(message)
+            encoder.encodeToOutput(message!!)
         }
     }
 
