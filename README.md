@@ -46,17 +46,23 @@ applications.
 Example CLI Usage
 -----------------
 
+The project comes with a CLI command to demonstrate an example implementation. Build the project (`./gradlew build`), then
+use the fat jar at `cli/build/libs/parse-email.jar`
+
 ```bash
-$ ./io.nade.email.parse -m json --file my-email.eml
-# json output (see below for an example)
+$ java -jar cli/build/libs/parse-email.jar \
+    --file lib/src/test/resources/email-sources/simple-multi.eml \
+    --format json
 ```
+
+See example output below.
 
 Example Library Usage
 ---------------------
 
 ```kotlin
 val file    = File("my-email.eml")
-val parser  = Parser.create()
+val parser  = Parser()
 val message = parser.parse(file.inputStream())
 
 val outFile = File("email.json")
