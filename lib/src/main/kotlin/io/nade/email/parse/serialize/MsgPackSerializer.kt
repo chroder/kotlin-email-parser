@@ -1,19 +1,19 @@
-package io.nade.email.parse.encode
+package io.nade.email.parse.serialize
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.nade.email.parse.ParsedMessage
 import org.msgpack.jackson.dataformat.MessagePackFactory
 import java.io.OutputStream
 
-class MsgPackEncoder(private val objectMapper: ObjectMapper) : EncoderInterface {
+class MsgPackSerializer(private val objectMapper: ObjectMapper) : SerializerInterface {
     companion object {
-        fun create(): MsgPackEncoder {
+        fun create(): MsgPackSerializer {
             val om = ObjectMapper(MessagePackFactory())
-            return MsgPackEncoder(om)
+            return MsgPackSerializer(om)
         }
     }
 
-    override fun encodeToStream(msg: ParsedMessage, ostream: OutputStream) {
+    override fun writeToStream(msg: ParsedMessage, ostream: OutputStream) {
         objectMapper.writeValue(ostream, msg)
         ostream.flush()
     }

@@ -1,4 +1,4 @@
-package io.nade.email.parse.encode
+package io.nade.email.parse.serialize
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -7,20 +7,20 @@ import java.io.OutputStream
 import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
 
-class JsonEncoder(private val gson: Gson) : EncoderInterface {
+class JsonSerializer(private val gson: Gson) : SerializerInterface {
     companion object {
-        fun create(): JsonEncoder {
+        fun create(): JsonSerializer {
             val gson = GsonBuilder()
                 .serializeNulls()
                 .setPrettyPrinting()
                 .setDateFormat("yyyy-MM-dd HH:mm:ss")
                 .create()
 
-            return JsonEncoder(gson)
+            return JsonSerializer(gson)
         }
     }
 
-    override fun encodeToStream(msg: ParsedMessage, ostream: OutputStream) {
+    override fun writeToStream(msg: ParsedMessage, ostream: OutputStream) {
         val writer = OutputStreamWriter(ostream, StandardCharsets.UTF_8)
         gson.toJson(msg, writer)
         writer.flush()

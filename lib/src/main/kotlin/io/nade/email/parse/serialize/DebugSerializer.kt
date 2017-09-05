@@ -1,4 +1,4 @@
-package io.nade.email.parse.encode
+package io.nade.email.parse.serialize
 
 import io.nade.email.parse.ParsedMessage
 import java.io.OutputStream
@@ -6,14 +6,14 @@ import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 
-class DebugEncoder : EncoderInterface {
+class DebugSerializer : SerializerInterface {
     companion object {
-        fun create(): DebugEncoder {
-            return DebugEncoder()
+        fun create(): DebugSerializer {
+            return DebugSerializer()
         }
     }
 
-    override fun encodeToStream(msg: ParsedMessage, ostream: OutputStream) {
+    override fun writeToStream(msg: ParsedMessage, ostream: OutputStream) {
         val writer = OutputStreamWriter(ostream, StandardCharsets.UTF_8)
         writer.appendln("Message Size: %s".format(msg.getReadableSize()))
         writer.appendln("Subject: %s".format(msg.subject))

@@ -1,9 +1,9 @@
 package io.nade.email.parse.cli
 
 import io.nade.email.parse.Parser
-import io.nade.email.parse.encode.DebugEncoder
-import io.nade.email.parse.encode.JsonEncoder
-import io.nade.email.parse.encode.MsgPackEncoder
+import io.nade.email.parse.serialize.DebugSerializer
+import io.nade.email.parse.serialize.JsonSerializer
+import io.nade.email.parse.serialize.MsgPackSerializer
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Options
 import org.apache.commons.cli.HelpFormatter
@@ -38,15 +38,15 @@ class ParseEmailCommand(
         val message = result.message
 
         val encoder = when (format) {
-            FormatOption.DEBUG   -> DebugEncoder.create()
-            FormatOption.JSON    -> JsonEncoder.create()
-            FormatOption.MSGPACK -> MsgPackEncoder.create()
+            FormatOption.DEBUG   -> DebugSerializer.create()
+            FormatOption.JSON    -> JsonSerializer.create()
+            FormatOption.MSGPACK -> MsgPackSerializer.create()
         }
 
         if (outFile != null) {
-            encoder.encodeToStream(message!!, outFile.outputStream())
+            encoder.writeToStream(message!!, outFile.outputStream())
         } else {
-            encoder.encodeToOutput(message!!)
+            encoder.writeToOutput(message!!)
         }
     }
 

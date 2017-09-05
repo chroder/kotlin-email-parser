@@ -67,7 +67,7 @@ val message = parser.parse(file.inputStream())
 
 val outFile = File("email.json")
 val encoder = JsonEncoder.create()
-encoder.encodeToStream(message, outFile.outputStream())
+encoder.writeToStream(message, outFile.outputStream())
 ```
 
 Example JSON Result
