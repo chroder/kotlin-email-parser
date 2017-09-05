@@ -1,28 +1,16 @@
 package io.nade.email.parse.serialize
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import io.nade.email.parse.ParsedMessage
-import java.io.OutputStream
-import java.io.OutputStreamWriter
-import java.nio.charset.StandardCharsets
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import java.text.SimpleDateFormat
 
-class JsonSerializer(private val gson: Gson) : SerializerInterface {
+class JsonSerializer(mapper: ObjectMapper) : JacksonSerializer(mapper) {
     companion object {
         fun create(): JsonSerializer {
-            val gson = GsonBuilder()
-                .serializeNulls()
-                .setPrettyPrinting()
-                .setDateFormat("yyyy-MM-dd HH:mm:ss")
-                .create()
-
-            return JsonSerializer(gson)
+            val om = ObjectMapper()
+            om.enable(SerializationFeature.INDENT_OUTPUT)
+            om.dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            return JsonSerializer(om)
         }
-    }
-
-    override fun writeToStream(msg: ParsedMessage, ostream: OutputStream) {
-        val writer = OutputStreamWriter(ostream, StandardCharsets.UTF_8)
-        gson.toJson(msg, writer)
-        writer.flush()
     }
 }
